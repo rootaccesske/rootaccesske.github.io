@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Root Access — Understand Computers. Don't Just Use Them.</title>
+<meta name="description" content="A 4-week hands-on technology program teaching teenagers and adults how computers actually work. Linux, command line, scripting, troubleshooting. Nairobi, Kenya.">
+<meta property="og:title" content="Root Access — Understand Computers. Don't Just Use Them.">
+<meta property="og:description" content="A hands-on tech program teaching how computers actually work. Linux, command line, scripting. Every student keeps their laptop.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0e17;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(22, 199, 132, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22, 199, 132, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Terminal header */
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .terminal-prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(22, 199, 132, 0.45);
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 42px;
+    color: #fff;
+    margin-bottom: 2px;
+    line-height: 1;
+  }
+  .logo span { color: #16C784; }
+
+  .tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, #16C784, rgba(22,199,132,0.05));
+    margin-bottom: 32px;
+  }
+
+  /* Section labels */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #16C784;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Paragraphs */
+  p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.75;
+    margin-bottom: 20px;
+    max-width: 540px;
+  }
+  p strong {
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Learn grid */
+  .learn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin-bottom: 32px;
+  }
+  .learn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.5;
+  }
+  .learn-item::before {
+    content: '>';
+    font-family: 'JetBrains Mono', monospace;
+    color: #16C784;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Week badges */
+  .weeks-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .week-badge {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .week-badge-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    color: #16C784;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .week-badge-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.3;
+  }
+
+  /* Laptop callout */
+  .laptop-callout {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(135deg, rgba(22, 199, 132, 0.1), rgba(22, 199, 132, 0.03));
+    border: 1.5px solid rgba(22, 199, 132, 0.25);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .laptop-callout::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: rgba(22, 199, 132, 0.08);
+    border-radius: 50%;
+    filter: blur(20px);
+  }
+  .laptop-icon {
+    font-size: 40px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .laptop-headline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #16C784;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .laptop-text {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+  }
+  .laptop-text strong { color: #fff; }
+
+  /* Details block */
+  .details-block {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 32px;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .detail-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-align: right;
+  }
+  .detail-value.highlight { color: #16C784; }
+  .detail-value .strike {
+    text-decoration: line-through;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    margin-right: 8px;
+  }
+
+  /* About instructor */
+  .about-block {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 32px;
+  }
+  .about-block p {
+    margin-bottom: 12px;
+  }
+  .about-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* CTA button */
+  .cta-btn {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #16C784, #0fa968);
+    border: none;
+    border-radius: 8px;
+    padding: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0a0e17;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 12px;
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(22, 199, 132, 0.3);
+  }
+  .cta-note {
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  /* FAQ */
+  .faq-item {
+    margin-bottom: 20px;
+  }
+  .faq-q {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+  }
+  .faq-a {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+  }
+
+  /* Contact footer */
+  .contact-footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    line-height: 2.2;
+  }
+  .contact-footer a {
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-footer a:hover {
+    color: #16C784;
+  }
+  .contact-footer .brand {
+    font-weight: 700;
+    color: rgba(22, 199, 132, 0.4);
+    letter-spacing: 2px;
+    margin-top: 12px;
+  }
+
+  @media (max-width: 500px) {
+    .container { padding: 28px 16px 40px; }
+    .logo { font-size: 32px; }
+    .learn-grid { grid-template-columns: 1fr; }
+    .weeks-row { flex-wrap: wrap; }
+    .week-badge { min-width: calc(50% - 4px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="terminal-bar">
+    <div class="dot dot-r"></div>
+    <div class="dot dot-y"></div>
+    <div class="dot dot-g"></div>
+  </div>
+  <div class="terminal-prompt">$ ./understand_computers --for-real</div>
+
+  <h1 class="logo">ROOT<span>/</span>ACCESS</h1>
+  <p class="tagline">Understand computers. Don't just use them.</p>
+
+  <div class="divider"></div>
+
+  <!-- Intro -->
+  <p>
+    Most people use computers every day but have <strong>no idea how they actually work</strong>. When something breaks, they panic. When they see a terminal, they freeze. They're consumers of technology, not people who understand it.
+  </p>
+  <p>
+    <strong>Root Access changes that.</strong> A 4-week hands-on program where you learn to install an operating system, navigate the command line, write scripts, and troubleshoot problems — the foundational skills that make you truly comfortable with technology.
+  </p>
+
+  <div class="divider" style="margin-top:12px"></div>
+
+  <!-- What you'll learn -->
+  <div class="section-label">// What you'll learn</div>
+  <div class="learn-grid">
+    <div class="learn-item">Install Linux from scratch</div>
+    <div class="learn-item">Navigate the command line</div>
+    <div class="learn-item">Write automation scripts</div>
+    <div class="learn-item">Troubleshoot like an engineer</div>
+    <div class="learn-item">Understand computer hardware</div>
+    <div class="learn-item">Fix things when they break</div>
+  </div>
+
+  <!-- 4 Weeks -->
+  <div class="section-label">// 4 saturdays in april</div>
+  <div class="weeks-row">
+    <div class="week-badge">
+      <div class="week-badge-num">Wk 1</div>
+      <div class="week-badge-title">Meet Your Machine</div>
+    </div>
+    <div class="week-badge">
+      <div class="week-badge-num">Wk 2</div>
+      <div class="week-badge-title">Command Line</div>
+    </div>
+    <div class="week-badge">
+      <div class="week-badge-num">Wk 3</div>
+      <div class="week-badge-title">Scripting</div>
+    </div>
+    <div class="week-badge">
+      <div class="week-badge-num">Wk 4</div>
+      <div class="week-badge-title">Demo Day</div>
+    </div>
+  </div>
+
+  <!-- Laptop callout -->
+  <div class="laptop-callout">
+    <div class="laptop-icon">💻</div>
+    <div>
+      <div class="laptop-headline">YOUR LAPTOP TO KEEP</div>
+      <div class="laptop-text">
+        Every student gets a personal laptop — install Linux, configure it during class, and <strong>take it home</strong> at the end of the program. It's yours.
+      </div>
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="section-label">// Program details</div>
+  <div class="details-block">
+    <div class="detail-row">
+      <span class="detail-label">Ages</span>
+      <span class="detail-value">12 – 18 (adults welcome)</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Class Size</span>
+      <span class="detail-value">Small group</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Schedule</span>
+      <span class="detail-value">Saturdays · 10AM – 1PM</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Venue</span>
+      <span class="detail-value">Nairobi Garage, Karen</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Early Bird</span>
+      <span class="detail-value highlight">KES 35,000</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Standard</span>
+      <span class="detail-value">KES 45,000</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Includes</span>
+      <span class="detail-value">Laptop + 12hrs instruction</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <a href="[YOUR_GOOGLE_FORM_LINK]" class="cta-btn" target="_blank">REGISTER INTEREST →</a>
+  <p class="cta-note">Limited spots · April 2026 · Laptop included</p>
+
+  <div class="divider"></div>
+
+  <!-- About -->
+  <div class="section-label">// Your instructor</div>
+  <div class="about-block">
+    <p>
+      <strong>Brian Nitletone Otieno</strong> — Senior Software Engineer with hands-on experience in Linux systems, enterprise software development, and real-world troubleshooting. Daily Linux user, works with PostgreSQL, Java, React, and TypeScript building healthcare software used across Africa.
+    </p>
+    <p>
+      This isn't theory from a textbook. It's practical knowledge from someone who installs, breaks, and fixes systems every day.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FAQ -->
+  <div class="section-label">// Frequently asked</div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ Does my child need any prior experience?</div>
+    <div class="faq-a">None at all. We start from zero. If they can turn on a computer, they're ready.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ What laptop will they receive?</div>
+    <div class="faq-a">A refurbished Lenovo ThinkPad — durable, reliable, and perfect for learning. They'll set it up themselves during the first class and take it home after the program.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ Is this a coding bootcamp?</div>
+    <div class="faq-a">No. We don't teach web development or app building. We teach how computers actually work — the operating system, command line, scripting, and troubleshooting. These are foundational skills that most CS graduates never properly learn.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ Can adults join?</div>
+    <div class="faq-a">Yes. We've had strong interest from adult learners too. The registration form covers both teenagers and adults.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ Can I pay in installments?</div>
+    <div class="faq-a">Yes — a deposit to secure your spot, with the balance due before the first session. Details shared upon registration.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$ What happens on Demo Day?</div>
+    <div class="faq-a">In the final session, students demonstrate what they've learned to parents and guests. It's a chance to see the skills in action.</div>
+  </div>
+
+  <!-- Final CTA -->
+  <div style="margin-top: 36px;">
+    <a href="[YOUR_GOOGLE_FORM_LINK]" class="cta-btn" target="_blank">REGISTER INTEREST →</a>
+    <p class="cta-note">Limited spots · April 2026 · Laptop included</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="contact-footer">
+    <a href="tel:0745847795">0745 847 795</a> · <a href="mailto:rootaccesske@gmail.com">rootaccesske@gmail.com</a><br>
+    Nairobi Garage · Karen, Nairobi<br>
+    <div class="brand">ROOT/ACCESS</div>
+  </div>
+
+</div>
+
+</body>
+</html>
