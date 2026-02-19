@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rootaccesske.github.io/sitemap.xml
